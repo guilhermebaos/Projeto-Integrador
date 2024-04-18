@@ -1,31 +1,39 @@
-// Get Audio Access
-const player = document.getElementById('player')
+// Create AudioContext
+const audioContext = new AudioContext()
 
-const downloadLink = document.getElementById('download')
-const stopButton = document.getElementById('stop')
+const testing = document.getElementById("testing")
 
-const handleSuccess = async function(stream) {
-    const options = {mimeType: 'audio/webm'}
-    const recordedChunks = []
-    const mediaRecorder = new MediaRecorder(stream, options)
+// Start Processing the Audio
+const tunerKnownString = async (context, meterElement) => {
+    await context.audioWorklet.addModule("tuner-known-string.js")
 
-    mediaRecorder.addEventListener('dataavailable', function(e) {
-        if (e.data.size > 0) recordedChunks.push(e.data)
-    })
+    const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true})
+    const micNode = context.createMediaStreamSource(mediaStream)
+    const volumeMeterNode = new AudioWorkletNode(context, "tuner-known-string")
 
-    mediaRecorder.addEventListener('stop', function() {
-        downloadLink.href = URL.createObjectURL(new Blob(recordedChunks))
-        downloadLink.download = 'acetest.wav'
-    })
+    volumeMeterNode.port.onmessage = ({data}) => {
+        meterElement.value = data * 100
+    }
 
-    stopButton.addEventListener('click', function() {
-        mediaRecorder.stop()
-    })
-
-    mediaRecorder.start()
+    micNode.connect(volumeMeterNode).connect(context.destination)
 }
 
-navigator.mediaDevices
-    .getUserMedia({audio: true, video: false})
-    .then(handleSuccess)
 
+// Start Tuning
+window.addEventListener("load", async () => {
+    // Get HTML Elements
+    const buttonEl = document.getElementById("button-start")
+    const meterEl = document.getElementById("volume-meter")
+
+    buttonEl.disabled = false
+    meterEl.disabled = false
+
+    // 
+    buttonEl.addEventListener("click", async () => {
+        await tunerKnownString(audioContext, meterEl)
+        
+        audioContext.resume()
+        buttonEl.disabled = true
+        buttonEl.textContent = "Playing..."
+    }, false)
+})

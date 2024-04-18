@@ -7,15 +7,19 @@ const testing = document.getElementById("testing")
 const tunerKnownString = async (context, meterElement) => {
     await context.audioWorklet.addModule("tuner-known-string.js")
 
+    // Setup Audio Recording
     const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true})
     const micNode = context.createMediaStreamSource(mediaStream)
-    const volumeMeterNode = new AudioWorkletNode(context, "tuner-known-string")
+    const tunerNode = new AudioWorkletNode(context, "tuner-known-string")
 
-    volumeMeterNode.port.onmessage = ({data}) => {
-        meterElement.value = data * 100
+    // Connect audio recorder to WorkletNode
+    micNode.connect(tunerNode).connect(context.destination)
+
+    // Post Data to HTML
+    tunerNode.port.onmessage = ({data}) => {
+        testing.innerText = data
+        console.log(data)
     }
-
-    micNode.connect(volumeMeterNode).connect(context.destination)
 }
 
 
@@ -28,12 +32,13 @@ window.addEventListener("load", async () => {
     buttonEl.disabled = false
     meterEl.disabled = false
 
-    // 
+    // Resume the AudioContext and start recording 
     buttonEl.addEventListener("click", async () => {
         await tunerKnownString(audioContext, meterEl)
         
         audioContext.resume()
         buttonEl.disabled = true
         buttonEl.textContent = "Playing..."
+
     }, false)
 })

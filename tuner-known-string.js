@@ -1,6 +1,13 @@
-const SMOOTHING_FACTOR = 0.8
-const FRAME_PER_SECOND = 60
+const FRAME_PER_SECOND = 10
 const FRAME_INTERVAL = 1 / FRAME_PER_SECOND
+
+const SAMPLE_CONST = 48000
+
+
+const SAMPLE_LEN = 128
+const SAMPLE_FREQ = 48000
+
+const SAMPLE_TIME = SAMPLE_LEN / SAMPLE_FREQ
 
 
 class TunerKnownString extends AudioWorkletProcessor {
@@ -8,31 +15,53 @@ class TunerKnownString extends AudioWorkletProcessor {
   constructor() {
       super()
       this.lastUpdate = currentTime
-      this.volume = 0
+      this.soundData = new Array()
+
+      this.loading = true
   }
 
-  calculateRMS(inputChannelData) {
+  calculateRMS() {
     // Calculate the squared-sum.
-    let sum = 0;
-    for (let i = 0; i < inputChannelData.length; i++) {
-      sum += inputChannelData[i] * inputChannelData[i]
+    let sum = 0
+    for (let i = 0; i < this.soundData.length; i++) {
+      sum += this.soundData[i] * this.soundData[i]
     }
 
     // Calculate the RMS level and update the volume.
-    let rms = Math.sqrt(sum / inputChannelData.length);
-    this.volume = Math.max(rms, this.volume * SMOOTHING_FACTOR);
+    let rms = Math.sqrt(sum / this.soundData.length)
+
+    return  rms
   }
 
   process(inputs, outputs) {
-    // This example only handles mono channel.
+    // Get the sound data
     const inputChannelData = inputs[0][0]
 
-    // Post a message to the node every 16ms.
-    if (currentTime - this.lastUpdate > FRAME_INTERVAL) {
+    if (this.loading) {
+      // Save the new sound data
+      this.soundData.push(...inputChannelData)
+
+      // Stop updating
+      if (this.soundData.length >= SAMPLE_CONST) {
+        this.loading = false
+        this.lastUpdate = currentTime
+      }
+    }
+
+    else {
+      // Add the new data and remove the old one
+      this.soundData.push(...inputChannelData)
+      this.soundData.splice(0, 128)
       
-      this.calculateRMS(inputChannelData)
-      this.port.postMessage(this.volume)
-      this.lastUpdate = currentTime
+
+      // Update every frame
+      if (currentTime - this.lastUpdate > FRAME_INTERVAL) {
+    
+        // Send the message to the main JS file
+
+        this.port.postMessage(this.calculateRMS())
+        this.lastUpdate = currentTime
+      }
     }
 
     return true;

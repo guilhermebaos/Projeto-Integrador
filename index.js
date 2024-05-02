@@ -23,8 +23,8 @@ const tunerKnownString = async (context, meterElement) => {
 
     // Post Data to HTML
     tunerNode.port.onmessage = ({data}) => {
-        console.log(data[0])
-        console.log(data[1])
+        console.log(data[2])
+        testing.innerText = data[2]
     }
 }
 

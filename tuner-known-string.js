@@ -29,19 +29,7 @@ class TunerKnownString extends AudioWorkletProcessor {
       this.soundData = new Array()
 
       this.loading = true
-  }
-
-  calculateRMS() {
-    // Calculate the squared-sum.
-    let sum = 0
-    for (let i = 0; i < this.soundData.length; i++) {
-      sum += this.soundData[i] * this.soundData[i]
-    }
-
-    // Calculate the RMS level and update the volume.
-    let rms = Math.sqrt(sum / this.soundData.length)
-
-    return rms
+      this.max = NaN
   }
 
   process(inputs, outputs) {

@@ -23,7 +23,7 @@ class TunerKnownString extends AudioWorkletProcessor {
 
   reset() {
       console.log("Here!")
-      
+
       this.lastUpdate = currentTime
       this.lastUpdate = currentTime
       this.soundData = new Array()
@@ -69,11 +69,10 @@ class TunerKnownString extends AudioWorkletProcessor {
       if (currentTime - this.lastUpdate > FRAME_INTERVAL) {
     
         // Send the message to the main JS file
-        this.soundDataComplex = new ComplexArray()
+        this.soundDataComplex = new ComplexArray(this.soundData)
         this.soundDataFFT = this.soundDataComplex.FFT()
 
-
-        this.port.postMessage(this.calculateRMS())
+        this.port.postMessage([this.soundDataFFT.real, this.soundDataFFT.imag])
         this.lastUpdate = currentTime
       }
     }

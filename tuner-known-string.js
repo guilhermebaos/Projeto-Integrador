@@ -36,6 +36,8 @@ class TunerKnownString extends AudioWorkletProcessor {
       this.max = NaN
   }
 
+  
+
   process(inputs, outputs) {
     // Get the sound data
     const inputChannelData = inputs[0][0]

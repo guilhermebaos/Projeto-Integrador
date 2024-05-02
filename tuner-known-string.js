@@ -36,7 +36,24 @@ class TunerKnownString extends AudioWorkletProcessor {
       this.max = NaN
   }
 
-  
+  identifyMax() {
+      
+      let N = this.soundDataFFT.length
+      let absolutes = new Array()
+
+      for(let i = 0; i < 1000; i++) {
+        absolutes.push( (this.soundDataFFT.real[i]**2 + this.soundDataFFT.imag[i]**2 )**.5 )
+      }
+
+      let maxValue = Math.max(...absolutes)
+      let maxIndex = absolutes.indexOf(maxValue)
+
+      // let delta = ( this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1] ) / (2*this.soundDataFFT[maxIndex] - this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1])
+      let delta = 0
+      let fpeak = (maxIndex - delta) * SAMPLE_FREQ / N
+
+      this.maxTemp = fpeak
+  }
 
   process(inputs, outputs) {
     // Get the sound data
@@ -66,7 +83,9 @@ class TunerKnownString extends AudioWorkletProcessor {
         this.soundDataComplex = new ComplexArray(this.soundData)
         this.soundDataFFT = this.soundDataComplex.FFT()
 
-        this.port.postMessage([this.soundDataFFT.real, this.soundDataFFT.imag])
+        this.identifyMax()
+
+        this.port.postMessage([this.soundDataFFT.real, this.soundDataFFT.imag, this.maxTemp])
         this.lastUpdate = currentTime
       }
     }

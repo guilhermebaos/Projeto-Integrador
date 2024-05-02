@@ -1,3 +1,6 @@
+// Import FFT
+import {ComplexArray} from '../fft.js'
+
 // Create AudioContext
 const audioContext = new AudioContext()
 

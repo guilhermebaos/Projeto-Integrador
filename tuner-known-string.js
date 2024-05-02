@@ -1,3 +1,6 @@
+import {ComplexArray} from "./lib/fft.js"
+
+
 const FRAME_PER_SECOND = 10
 const FRAME_INTERVAL = 1 / FRAME_PER_SECOND
 

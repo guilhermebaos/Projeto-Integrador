@@ -1,4 +1,5 @@
-import {ComplexArray} from "./lib/fft.js"
+// Import FFT
+import {ComplexArray} from '../fft.js'
 
 
 const FRAME_PER_SECOND = 10
@@ -17,6 +18,13 @@ class TunerKnownString extends AudioWorkletProcessor {
 
   constructor() {
       super()
+      this.reset()
+  }
+
+  reset() {
+      console.log("Here!")
+      
+      this.lastUpdate = currentTime
       this.lastUpdate = currentTime
       this.soundData = new Array()
 
@@ -33,7 +41,7 @@ class TunerKnownString extends AudioWorkletProcessor {
     // Calculate the RMS level and update the volume.
     let rms = Math.sqrt(sum / this.soundData.length)
 
-    return  rms
+    return rms
   }
 
   process(inputs, outputs) {
@@ -61,14 +69,17 @@ class TunerKnownString extends AudioWorkletProcessor {
       if (currentTime - this.lastUpdate > FRAME_INTERVAL) {
     
         // Send the message to the main JS file
+        this.soundDataComplex = new ComplexArray()
+        this.soundDataFFT = this.soundDataComplex.FFT()
+
 
         this.port.postMessage(this.calculateRMS())
         this.lastUpdate = currentTime
       }
     }
 
-    return true;
+    return true
   }
 }
 
-registerProcessor("tuner-known-string", TunerKnownString);
+registerProcessor("tuner-known-string", TunerKnownString)

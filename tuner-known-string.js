@@ -26,9 +26,13 @@ class TunerKnownString extends AudioWorkletProcessor {
 
       this.lastUpdate = currentTime
       this.lastUpdate = currentTime
-      this.soundData = new Array()
 
+      // Loading more sound
+      this.soundData = new Array()
       this.loading = true
+
+      // Peak detection
+      this.maxTemp = NaN
       this.max = NaN
   }
 

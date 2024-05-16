@@ -2,16 +2,25 @@
 import {ComplexArray} from '../fft.js'
 
 
+// Set the framerate
 const FRAME_PER_SECOND = 10
 const FRAME_INTERVAL = 1 / FRAME_PER_SECOND
 
+
+// Total amount of samples to hold
 const SAMPLE_CONST = 48000
 
-
+// Samples in each batch
 const SAMPLE_LEN = 128
+
+// Sampling Frequency 
 const SAMPLE_FREQ = 48000
 
+// Real time corresponding to each batch
 const SAMPLE_TIME = SAMPLE_LEN / SAMPLE_FREQ
+
+// Smoothing factor
+const ALPHA = 0.7
 
 
 class TunerKnownString extends AudioWorkletProcessor {
@@ -52,7 +61,37 @@ class TunerKnownString extends AudioWorkletProcessor {
       let delta = 0
       let fpeak = (maxIndex - delta) * SAMPLE_FREQ / N
 
-      this.maxTemp = fpeak
+      this.max = fpeak
+  }
+
+  identifyKnownMax(freq, tol, percent=false) {
+
+      if (percent){
+        tol = tol * freq / 100
+      }
+
+      let trueN = this.soundDataFFT.length
+      
+      let parte_real = this.soundDataFFT.real.slice(freq-tol,freq+tol)
+      let parte_imag = this.soundDataFFT.imag.slice(freq-tol,freq+tol)
+      let real_and_imag = new ComplexArray(parte_real)
+      real_and_imag.imag = parte_imag
+
+      let N = real_and_imag.length
+      let absolutes = new Array()
+
+      for(let i = 0; i < N; i++) {
+        absolutes.push( (real_and_imag.real[i]**2 + real_and_imag.imag[i]**2 )**.5 )
+      }
+
+      let maxValue = Math.max(...absolutes)
+      let maxIndex = absolutes.indexOf(maxValue) + freq - tol
+
+      // let delta = ( this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1] ) / (2*this.soundDataFFT[maxIndex] - this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1])
+      let delta = 0
+      let fpeak = (maxIndex - delta) * SAMPLE_FREQ / trueN
+
+      this.max = fpeak
   }
 
   process(inputs, outputs) {
@@ -84,8 +123,14 @@ class TunerKnownString extends AudioWorkletProcessor {
         this.soundDataFFT = this.soundDataComplex.FFT()
 
         this.identifyMax()
+        if (this.maxTemp) {
+          this.max = this.max * ALPHA + this.maxTemp * (1 - ALPHA)
+          this.maxTemp = this.max
+        } else {
+          this.maxTemp = this.max
+        }
 
-        this.port.postMessage([this.soundDataFFT.real, this.soundDataFFT.imag, this.maxTemp])
+        this.port.postMessage([this.soundDataFFT.real, this.soundDataFFT.imag, this.max])
         this.lastUpdate = currentTime
       }
     }

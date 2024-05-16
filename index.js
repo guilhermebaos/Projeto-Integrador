@@ -1,13 +1,15 @@
 // Import FFT
 import {ComplexArray} from './fft.js'
 
+// Global variables
+let progressBar
+let freqTarget = 440
+
 // Create AudioContext
 const audioContext = new AudioContext()
 
 const testing = document.getElementById("testing")
 
-// Search window when looking at know string
-const tol = 40
 
 // Start Processing the Audio
 const tunerKnownString = async (context) => {
@@ -27,14 +29,19 @@ const tunerKnownString = async (context) => {
     // Post Data to HTML
     tunerNode.port.onmessage = ({data}) => {
         testing.innerText = data[2]
+        updateBar(progressBar, data[2])
     }
 }
 
 
+// Search window when looking at know string
+// https://codepen.io/alvarotrigo/pen/vYeNpjj
+const tol = 40
+const dur = 0.1
 
-function updateBar(progressBar, target, current) {
+function updateBar(progressBar, current) {
     // Percentagem de distância do alvo, tendo em conta a tolerância
-    pos = (current - target) / (2 * tol) + 0.5
+    let pos = (current - freqTarget) / (2 * tol) + 0.5
 
     if (pos < 0) {
         pos = 0
@@ -43,8 +50,8 @@ function updateBar(progressBar, target, current) {
     }
 
     gsap.to(progressBar, {
-        x: `${target}%`,
-        duration: 2,
+        x: `${pos * 100}%`,
+        duration: dur,
     });
 }
 
@@ -56,37 +63,7 @@ window.addEventListener("load", async () => {
     const buttonStart = document.getElementById("button-start")
     const buttonStop = document.getElementById("button-stop")
 
-    const progressBarContainer = document.querySelector('.progress-bar__container')
-    const progressBar = document.querySelector('.progress-bar')
-
-    const progressBarStates = [0, 7, 27, 34, 68, 80, 95, 100];
-
-    let time = 0;
-    let endState = 100;
-
-    progressBarStates.forEach(state => {
-    let randomTime = Math.floor(Math.random() * 3000);
-    setTimeout(() => {
-        if(state == endState){
-        gsap.to(progressBar, {
-            x: `${state}%`,
-            duration: 2,
-            backgroundColor: '#4895ef',
-            onComplete: () => {
-            progressBarText.style.display = "initial";
-            progressBarContainer.style.boxShadow = '0 0 5px #4895ef';
-            }
-        });
-        }else{
-        gsap.to(progressBar, {
-            x: `${state}%`,
-            duration: 2,
-        });
-        }
-    }, randomTime + time);
-    time += randomTime;
-    })
-
+    progressBar = document.querySelector('.progress-bar')
 
     buttonStart.disabled = false
     buttonStop.disabled = true

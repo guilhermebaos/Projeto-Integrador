@@ -33,43 +33,47 @@
     <link rel="stylesheet" href="style.css">
 
     <title>
-        Afinador Digital!
+        Best Online Tuner
     </title>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="index.html">Afinador Digital!</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="nav">
-            <ul class="navbar-nav me-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="tuner-known-string/index.html">Corda Conhecida</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Page 02</a>
-              </li>
-            </ul>
-          </div>
+      <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">Afinador Digital!</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="tuner-known-string/index.html">Corda Conhecida</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Page 02</a>
+            </li>
+          </ul>
         </div>
-      </nav>
+      </div>
+    </nav>
 
     <main class="container text-center mt-4 col-md-8 col-md-offset-2 col-xl-6 col-xl-offset-6">
         <div class="container w-100">
           <img src="img/title.png" alt="Imagem do Título">
         </div>
-        <div class="container w-100">
-          <p>
-            Vamos afinar a tua guitarra:
-          </p>
-        </div>
-        <div class="d-grid gap-2 col-6 mx-auto">
-          <a href="tuner-known-string.html"><button type="button" class="btn btn-light">Deteção Automática da Corda</button></a>
-          <a href="tuner-known-string.html"><button type="button" class="btn btn-light">Indicar a Corda a Afinar</button></a>
+        <div class="container">
+          <button id="button-start" type="button" class="btn btn-light" data-mdb-ripple-init data-mdb-ripple-color="dark">Start</button>
+          <button id="button-stop" type="button" class="btn btn-light" data-mdb-ripple-init data-mdb-ripple-color="dark">Stop</button>
         </div>
 
+        <div class="demo-box">
+        <div class="p-3 mb-2 bg-slate-100 w-1/3 rounded text-sm">
+            <input id="volume-meter" class="w-full bg-white"
+            type="range" min="0" max="100" value="0" step="1" disabled>
+        </div>
+        </div>
+        <div class="container">
+            <p id="testing">GO!</p>
+        </div>
     </main>
 
     <footer class="container-fluid bg-primary fs-5 text-light p-3 mt-5">
@@ -84,6 +88,6 @@
     </footer>
 
     <!-- Our JS -->
-    <script src="index.js" type="module"></script>
+    <script src="tuner-known-string-index.js" type="module"></script>
 </body>
 </html>

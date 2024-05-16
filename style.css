@@ -4,7 +4,19 @@ body {
 }
 
 nav {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
+    text-align: center;
+    font-family: "Century Gothic";
+    font-style: italic;
+    font-weight: bolder;
+}
+
+nav, footer {
+    background-color: #1b1919;
+}
+
+.nav-link{
+    color: #c1c1c1;
 }
 
 .img-title {

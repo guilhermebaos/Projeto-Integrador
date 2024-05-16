@@ -36,21 +36,35 @@ class TunerKnownString extends AudioWorkletProcessor {
       this.max = NaN
   }
 
-  identifyMax() {
+  identifyMax(freq, tol, percent=false) {
+
+      if (percent){
+        tol = tol * freq / 100
+      }
+
+      let trueN = this.soundDataFFT.length
       
-      let N = this.soundDataFFT.length
+      let parte_real = this.soundDataFFT.real.slice(freq-tol,freq+tol)
+      let parte_imag = this.soundDataFFT.imag.slice(freq-tol,freq+tol)
+      let real_and_imag = new ComplexArray(parte_real)
+      real_and_imag.imag = parte_imag
+
+      let N = real_and_imag.length
       let absolutes = new Array()
 
-      for(let i = 0; i < 1000; i++) {
-        absolutes.push( (this.soundDataFFT.real[i]**2 + this.soundDataFFT.imag[i]**2 )**.5 )
+      for(let i = 0; i < N; i++) {
+        absolutes.push( (real_and_imag.real[i]**2 + real_and_imag.imag[i]**2 )**.5 )
       }
 
       let maxValue = Math.max(...absolutes)
-      let maxIndex = absolutes.indexOf(maxValue)
+      let maxIndex = absolutes.indexOf(maxValue) + freq - tol
+      console.log(maxIndex)
 
       // let delta = ( this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1] ) / (2*this.soundDataFFT[maxIndex] - this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1])
       let delta = 0
-      let fpeak = (maxIndex - delta) * SAMPLE_FREQ / N
+      let fpeak = (maxIndex - delta) * SAMPLE_FREQ / trueN
+
+      console.log(fpeak)
 
       this.maxTemp = fpeak
   }
@@ -83,7 +97,7 @@ class TunerKnownString extends AudioWorkletProcessor {
         this.soundDataComplex = new ComplexArray(this.soundData)
         this.soundDataFFT = this.soundDataComplex.FFT()
 
-        this.identifyMax()
+        this.identifyMax(440, 100)
 
         this.port.postMessage([this.soundDataFFT.real, this.soundDataFFT.imag, this.maxTemp])
         this.lastUpdate = currentTime

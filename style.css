@@ -61,8 +61,13 @@ nav, footer {
     color: white;
     font-family: sans-serif;
   }
-  
-  .progress-bar__text {
-    display: none;
-  }
+
+  .progress-bar__container:after {
+    content: '';
+    position: absolute;
+    border-right: 4px green solid;
+    height: 150%;
+    width: 100%;
+    transform: translateX(-100%);
+}
   

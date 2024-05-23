@@ -75,7 +75,7 @@ class TunerKnownString extends AudioWorkletProcessor {
       let maxIndex = absolutes.indexOf(maxValue)
 
       // Correct the maximum
-      let delta = ( this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1] ) / (2*this.soundDataFFT[maxIndex] - this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1])
+      let delta = 0
       let fpeak = (maxIndex - delta) * SAMPLE_FREQ / N
       this.max = fpeak
 
@@ -124,7 +124,7 @@ class TunerKnownString extends AudioWorkletProcessor {
       let maxIndex = absolutes.indexOf(maxValue) + freq - tol
 
       // Correct the maximum
-      let delta = ( this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1] ) / (2*this.soundDataFFT[maxIndex] - this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1])
+      let delta = 0
       let fpeak = (maxIndex - delta) * SAMPLE_FREQ / trueN
       this.max = fpeak
 

@@ -32,6 +32,10 @@ const AVE = 10
 // const SMO = 1.1
 
 
+// Maximum frequency to search for
+const MAXFREQ = 500
+
+
 class TunerKnownString extends AudioWorkletProcessor {
 
   constructor() {
@@ -58,23 +62,24 @@ class TunerKnownString extends AudioWorkletProcessor {
   }
 
   identifyMax() {
-
+      // Size of the sample
       let N = this.soundDataFFT.length
       let absolutes = new Array()
 
-      for(let i = 0; i < 1000; i++) {
+      // Search for peak frequncy in range
+      for(let i = 0; i < MAXFREQ; i++) {
         absolutes.push( (this.soundDataFFT.real[i]**2 + this.soundDataFFT.imag[i]**2 )**.5 )
       }
 
       let maxValue = Math.max(...absolutes)
       let maxIndex = absolutes.indexOf(maxValue)
 
-      // let delta = ( this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1] ) / (2*this.soundDataFFT[maxIndex] - this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1])
-      let delta = 0
+      // Correct the maximum
+      let delta = ( this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1] ) / (2*this.soundDataFFT[maxIndex] - this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1])
       let fpeak = (maxIndex - delta) * SAMPLE_FREQ / N
-
       this.max = fpeak
 
+      // Find closest guitar string
       let dists = new Array()
 
       for(let i = 0; i < 6; i++){
@@ -82,9 +87,9 @@ class TunerKnownString extends AudioWorkletProcessor {
       }
 
       let minDist = Math.min(...dists)
-
       let freqIndex = dists.indexOf(minDist)
 
+      // Return values
       this.refFreq = FREQS[freqIndex]
       this.refToler = TOLERS[freqIndex]
       this.refLetter = LETTERS[freqIndex]
@@ -93,13 +98,15 @@ class TunerKnownString extends AudioWorkletProcessor {
 
 
   identifyKnownMax(freq, tol, percent=false) {
-
+      // Calculate tolerance
       if (percent){
         tol = tol * freq / 100
       }
 
+      // Size of the sample
       let trueN = this.soundDataFFT.length
       
+      // Slice within tolerance
       let parte_real = this.soundDataFFT.real.slice(freq-tol,freq+tol)
       let parte_imag = this.soundDataFFT.imag.slice(freq-tol,freq+tol)
       let real_and_imag = new ComplexArray(parte_real)
@@ -108,6 +115,7 @@ class TunerKnownString extends AudioWorkletProcessor {
       let N = real_and_imag.length
       let absolutes = new Array()
 
+      // Search for peak frequncy in range
       for(let i = 0; i < N; i++) {
         absolutes.push( (real_and_imag.real[i]**2 + real_and_imag.imag[i]**2 )**.5 )
       }
@@ -115,13 +123,14 @@ class TunerKnownString extends AudioWorkletProcessor {
       let maxValue = Math.max(...absolutes)
       let maxIndex = absolutes.indexOf(maxValue) + freq - tol
 
+      // Correct the maximum
       let delta = ( this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1] ) / (2*this.soundDataFFT[maxIndex] - this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1])
       let fpeak = (maxIndex - delta) * SAMPLE_FREQ / trueN
-
       this.max = fpeak
 
       let ind = FREQS.indexOf(freq)
 
+      // Return values
       this.refFreq = freq
       this.refToler = tol
       this.refLetter = ind
@@ -169,7 +178,7 @@ class TunerKnownString extends AudioWorkletProcessor {
         // nextMax = average(this.lastMax)
         // let jump = Math.exp(-(Math.abs(this.showMax - nextMax) / this.showMax) * SMO)
         // this.showMax = this.showMax * (1 - jump) + nextMax * jump
-        
+
         this.showMax = average(this.lastMax)
     
         this.port.postMessage([this.showMax, this.refFreq, this.refToler, this.refLetter])

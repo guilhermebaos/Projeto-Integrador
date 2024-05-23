@@ -28,8 +28,9 @@ const tunerKnownString = async (context) => {
 
     // Post Data to HTML
     tunerNode.port.onmessage = ({data}) => {
-        testing.innerText = data[2]
-        updateBar(progressBar, data[2])
+        testing.innerText = data[0]
+        updateBar(progressBar, data[0])
+        console.log(data)
     }
 }
 

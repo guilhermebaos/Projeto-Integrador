@@ -39,20 +39,53 @@ const tunerKnownString = async (context) => {
 const tol = 40
 const dur = 0.1
 
+const startColor = [94, 252, 141]
+const endColor = [218, 44, 56]
+
+function gradient(num) {
+    let color = [0, 0, 0]
+
+    if (num < 0) {
+        num = 0
+    } else if (num > 1) {
+        num = 1
+    }
+
+    for (let i = 0; i <= 2; i++) {
+        color[i] = startColor[i] * (1-num) + endColor[i] * num
+    }
+    
+    return color
+}
+
 function updateBar(progressBar, current) {
     // Percentagem de distância do alvo, tendo em conta a tolerância
-    let pos = (current - freqTarget) / (2 * tol) + 0.5
+    let error = (current - freqTarget) / (2 * tol)
 
+    // Cor do gradiente
+    let color = gradient(2 * Math.abs(error))
+
+    // Posição em percentagem
+    let pos = error + 0.5
     if (pos < 0) {
         pos = 0
     } else if (pos > 1) {
         pos = 1
     }
 
+    // Atualizar a barra
     gsap.to(progressBar, {
         x: `${pos * 100}%`,
         duration: dur,
-    });
+        backgroundColor: `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+    })
+
+    // Ver se a mão está
+    if (Math.abs(pos - 0.5) < 0.03) {
+        perfect.style.display = "block"
+    } else {
+        perfect.style.display = "none"
+    }
 }
 
 
@@ -62,6 +95,8 @@ window.addEventListener("load", async () => {
     // Get HTML Elements
     const buttonStart = document.getElementById("button-start")
     const buttonStop = document.getElementById("button-stop")
+
+    const perfect = document.getElementById("perfect")
 
     progressBar = document.querySelector('.progress-bar')
 

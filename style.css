@@ -26,15 +26,31 @@ nav, footer {
 }
 
 
+.img-footer {
+    margin: auto;
+    max-width: 700px;
+}
+
+
+.img-tuner {
+  max-width: 80px;
+}
+
+
+.img-low {
+  max-width: 50px;
+}
+
+
 .container__container__container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     width: 100%;
-  }
+}
   
-  .progress-bar__container {
+.progress-bar__container {
     width: 80%;
     height: 2rem;
     border-radius: 2rem;
@@ -42,10 +58,10 @@ nav, footer {
     overflow: hidden;
     transition: all 0.5s;
     will-change: transform;
-    box-shadow: 0 0 5px #e76f51;
-  }
+    box-shadow: 0 0 5px #F8EA03;
+}
   
-  .progress-bar {
+.progress-bar {
     position: absolute;
     height: 100%;
     width: 100%;
@@ -60,13 +76,13 @@ nav, footer {
     align-items:center;
     color: white;
     font-family: sans-serif;
-  }
+}
 
-  .progress-bar__container:after {
+.progress-bar__container:after {
     content: '';
     position: absolute;
-    border-right: 4px green solid;
-    height: 150%;
+    border-right: 4px rgb(94, 252, 141) solid;
+    height: 100%;
     width: 100%;
     transform: translateX(-100%);
 }

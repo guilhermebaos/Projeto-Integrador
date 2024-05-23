@@ -66,9 +66,24 @@
           <button id="button-stop" type="button" class="btn btn-light" data-mdb-ripple-init data-mdb-ripple-color="dark">Stop</button>
         </div>
 
-        <div class="container my-3 progress-bar__container__container">
-          <div class="progress-bar__container mx-auto">
-            <div class="progress-bar"></div>
+        <div class="container px-5">
+          <div class="row my-3 progress-bar__container__container">          
+            <div class="progress-bar__container mx-auto">
+              <div class="progress-bar"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-2">
+              <img class="img-tuner img-low" src="img/low.png" alt="Too low!">
+            </div>
+            <div class="col-8">
+              <div id="perfect" style="display: none;">
+                <img class="img-tuner img-mid" src="img/mid.png" alt="Perfect!">
+              </div>
+            </div>
+            <div class="col-2">
+              <img class="img-tuner img-high" src="img/high.png" alt="Too high!">
+            </div>
           </div>
         </div>
 
@@ -80,6 +95,9 @@
 
     <footer class="container-fluid fs-5 text-light p-3 mt-5">
       <div class="row">
+        <img class="img-footer" src="img/footer-guitars.png" alt="Silhouette of Guitars">
+      </div>
+      <div class="row p-1 pt-3">
         <div class="col-md-6 text-md-start col-12 text-center">
           <a class="navbar-brand" href="index.html"><img width="160" src="img/title.png" alt="Imagem do Título"></a>
         </div>

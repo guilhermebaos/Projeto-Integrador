@@ -3,12 +3,9 @@ import {ComplexArray} from './fft.js'
 
 // Global variables
 let progressBar
-let freqTarget = 440
 
 // Create AudioContext
 const audioContext = new AudioContext()
-
-const testing = document.getElementById("testing")
 
 
 // Start Processing the Audio
@@ -20,24 +17,21 @@ const tunerKnownString = async (context) => {
     const micNode = context.createMediaStreamSource(mediaStream)
     const tunerNode = new AudioWorkletNode(context, "tuner-known-string")
 
-    tunerNode.port.postMessage
-
 
     // Connect audio recorder to WorkletNode
     micNode.connect(tunerNode).connect(context.destination)
 
     // Post Data to HTML
     tunerNode.port.onmessage = ({data}) => {
-        testing.innerText = data[0]
-        updateBar(progressBar, data[0])
-        console.log(data)
+        letter.innerText = data[3]
+        console.log(data[0])
+        updateBar(progressBar, data[0], data[1], data[2])
     }
 }
 
 
 // Search window when looking at know string
 // https://codepen.io/alvarotrigo/pen/vYeNpjj
-const tol = 40
 const dur = 0.1
 
 const startColor = [94, 252, 141]
@@ -59,7 +53,7 @@ function gradient(num) {
     return color
 }
 
-function updateBar(progressBar, current) {
+function updateBar(progressBar, current, freqTarget, tol) {
     // Percentagem de distância do alvo, tendo em conta a tolerância
     let error = (current - freqTarget) / (2 * tol)
 
@@ -98,6 +92,7 @@ window.addEventListener("load", async () => {
     const buttonStop = document.getElementById("button-stop")
 
     const perfect = document.getElementById("perfect")
+    const letter = document.getElementById("letter")
 
     progressBar = document.querySelector('.progress-bar')
 

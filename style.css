@@ -42,6 +42,16 @@ nav, footer {
 }
 
 
+.img-footer-container {
+  background-color: #242222;
+}
+
+
+#letter {
+  font-size: 2em;
+}
+
+
 .container__container__container {
     display: flex;
     justify-content: center;

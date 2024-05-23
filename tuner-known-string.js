@@ -19,12 +19,18 @@ const SAMPLE_FREQ = 48000
 // Real time corresponding to each batch
 const SAMPLE_TIME = SAMPLE_LEN / SAMPLE_FREQ
 
-// Smoothing factor
-const ALPHA = 0.7
+// Guitar strings
+const FREQS = [82, 110, 147, 196, 247, 330]
+const TOLERS = [14, 19, 25, 26, 42, 42]
+const LETTERS = ["E2", "A2", "D3", "G3", "B3", "E4"]
 
-const freqs = [82, 110, 147, 196, 247, 330]
-const tolers = [14, 19, 25, 26, 42, 42]
-const letters = ["E", "A", "D", "G", "B", "E"]
+// Averaging length
+const average = array => array.reduce((a, b) => a + b) / array.length
+const AVE = 10
+
+// Smoothing factor (higher is slower, smoother)
+// const SMO = 1.1
+
 
 class TunerKnownString extends AudioWorkletProcessor {
 
@@ -33,10 +39,8 @@ class TunerKnownString extends AudioWorkletProcessor {
       this.reset()
   }
 
-  reset() {
-      console.log("Here!")
-
-      this.lastUpdate = currentTime
+  reset() { 
+      // Get the time
       this.lastUpdate = currentTime
 
       // Loading more sound
@@ -44,9 +48,11 @@ class TunerKnownString extends AudioWorkletProcessor {
       this.loading = true
 
       // Peak detection
-      this.maxTemp = NaN
       this.max = NaN
+      this.showMax = NaN
+      this.lastMax = new Array()
 
+      // Auto-identify peaks
       this.refFreq = NaN
       this.refToler = NaN
   }
@@ -67,21 +73,21 @@ class TunerKnownString extends AudioWorkletProcessor {
       let delta = 0
       let fpeak = (maxIndex - delta) * SAMPLE_FREQ / N
 
-      this.maxTemp = fpeak
+      this.max = fpeak
 
       let dists = new Array()
 
       for(let i = 0; i < 6; i++){
-        dists[i] = Math.abs(fpeak - freqs[i])
+        dists[i] = Math.abs(fpeak - FREQS[i])
       }
 
       let minDist = Math.min(...dists)
 
       let freqIndex = dists.indexOf(minDist)
 
-      this.refFreq = freqs[freqIndex]
-      this.refToler = tolers[freqIndex]
-      this.refLetter = letters[freqIndex]
+      this.refFreq = FREQS[freqIndex]
+      this.refToler = TOLERS[freqIndex]
+      this.refLetter = LETTERS[freqIndex]
 
   }
 
@@ -109,13 +115,12 @@ class TunerKnownString extends AudioWorkletProcessor {
       let maxValue = Math.max(...absolutes)
       let maxIndex = absolutes.indexOf(maxValue) + freq - tol
 
-      // let delta = ( this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1] ) / (2*this.soundDataFFT[maxIndex] - this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1])
-      let delta = 0
+      let delta = ( this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1] ) / (2*this.soundDataFFT[maxIndex] - this.soundDataFFT[maxIndex+1] - this.soundDataFFT[maxIndex-1])
       let fpeak = (maxIndex - delta) * SAMPLE_FREQ / trueN
 
-      this.maxTemp = fpeak
+      this.max = fpeak
 
-      let ind = freqs.indexOf(freq)
+      let ind = FREQS.indexOf(freq)
 
       this.refFreq = freq
       this.refToler = tol
@@ -151,17 +156,23 @@ class TunerKnownString extends AudioWorkletProcessor {
         this.soundDataFFT = this.soundDataComplex.FFT()
 
         
-        // this.identifyKnownMax(440, 100)
         this.identifyMax()
-
-        if (this.max) {
-          this.maxTemp = this.maxTemp * ALPHA + this.max * (1 - ALPHA)
-          this.max = this.maxTemp
-        } else {
-          this.max = this.maxTemp
+        this.lastMax.push(this.max)
+        if (this.lastMax.length == 1) {
+          this.showMax = average(this.lastMax)
         }
+        if (this.lastMax.length > AVE) {
+          this.lastMax.splice(0, 1)
+        }
+
+        // Exponential smoothing
+        // nextMax = average(this.lastMax)
+        // let jump = Math.exp(-(Math.abs(this.showMax - nextMax) / this.showMax) * SMO)
+        // this.showMax = this.showMax * (1 - jump) + nextMax * jump
+        
+        this.showMax = average(this.lastMax)
     
-        this.port.postMessage([this.maxTemp, this.refFreq, this.refToler, this.refLetter])
+        this.port.postMessage([this.showMax, this.refFreq, this.refToler, this.refLetter])
         this.lastUpdate = currentTime
       }
     }

@@ -10,6 +10,9 @@ let canvas
 let ctx
 let canvasPoints = new Array()
 
+let XMAX
+let YMAX
+
 
 // Start Processing the Audio
 const tunerAnalyser = async (context) => {
@@ -26,9 +29,39 @@ const tunerAnalyser = async (context) => {
 
     // Post Data to HTML
     tunerNode.port.onmessage = ({data}) => {
-        ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        updateCanvas(data)
     }
+}
+
+
+// Obter o DPR do ecrã
+const DPR = window.devicePixelRatio
+
+
+// Fix the canvas size, account for DPR
+function fixCanvas() {
+
+    // Canvas size
+    let larguraCss = +getComputedStyle(canvas).getPropertyValue('width').slice(0, -2)
+    let alturaCss = +getComputedStyle(canvas).getPropertyValue('height').slice(0, -2)
+
+    // Change canvas properties
+    canvas.width = larguraCss * DPR
+    canvas.height = alturaCss * DPR
+
+    // Fix size of HTML element
+    canvas.style.width = `${larguraCss}px`
+    canvas.style.height = `${alturaCss}px`
+}
+
+
+function updateCanvas(data) {
+    // Clear the canvas
+
+    // Update frequency 
+    canvasPoints.push(data)
+    console.log(data)
+
 }
 
 
@@ -44,8 +77,15 @@ window.addEventListener("load", async () => {
 
 
     // Get our canvas
-    canvas = document.getElementById('freqScreen')
-    ctx = canvas.getContext('2d')
+    canvas = document.getElementById("freqScreen")
+    ctx = canvas.getContext("2d")
+    
+    // Fix canvas size
+    fixCanvas()
+
+    XMAX = canvas.width
+    YMAX = canvas.height
+    
 
 
     // Resume the AudioContext and start recording 

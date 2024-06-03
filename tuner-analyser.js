@@ -51,18 +51,15 @@ class TunerAnalyser extends AudioWorkletProcessor {
 
   // Get the magnitude of all FFT coefficients within the desired range
   mag() {
-      // Size of the sample
-      let N = this.soundDataFFT.length
-
-      // Slice within tolerance
+      // Slice within range
       let real = this.soundDataFFT.real.slice(MINFREQ, MAXFREQ+1)
       let imag = this.soundDataFFT.imag.slice(MINFREQ, MAXFREQ+1)
 
       let absolutes = new Array()
 
       // Calculate the absolute values
-      for(let i = 0; i < N; i++) {
-        absolutes.push((real[i]**2 + imag[i]**2 )**0.5)
+      for(let i = 0; i < MAXFREQ-MINFREQ+1; i++) {
+        absolutes.push(real[i]**2 + imag[i]**2)
       }
 
       // Return

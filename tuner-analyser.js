@@ -49,6 +49,26 @@ class TunerAnalyser extends AudioWorkletProcessor {
       this.refToler = NaN
   }
 
+  // Get the magnitude of all FFT coefficients within the desired range
+  mag() {
+      // Size of the sample
+      let N = this.soundDataFFT.length
+
+      // Slice within tolerance
+      let real = this.soundDataFFT.real.slice(MINFREQ, MAXFREQ+1)
+      let imag = this.soundDataFFT.imag.slice(MINFREQ, MAXFREQ+1)
+
+      let absolutes = new Array()
+
+      // Calculate the absolute values
+      for(let i = 0; i < N; i++) {
+        absolutes.push((real[i]**2 + imag[i]**2 )**0.5)
+      }
+
+      // Return
+      this.soundDataAbs = absolutes
+  }
+
 
   process(inputs, outputs) {
     // Get the sound data
@@ -77,8 +97,10 @@ class TunerAnalyser extends AudioWorkletProcessor {
         // Send the message to the main JS file
         this.soundDataComplex = new ComplexArray(this.soundData)
         this.soundDataFFT = this.soundDataComplex.FFT()
+
+        this.mag()
     
-        this.port.postMessage([this.showMax, this.refFreq, this.refToler, this.refLetter])
+        this.port.postMessage(this.soundDataAbs)
         this.lastUpdate = currentTime
       }
     }

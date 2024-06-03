@@ -5,6 +5,12 @@ import {ComplexArray} from './fft.js'
 const audioContext = new AudioContext()
 
 
+// Global variables
+let canvas
+let ctx
+let canvasPoints = new Array()
+
+
 // Start Processing the Audio
 const tunerAnalyser = async (context) => {
     await context.audioWorklet.addModule("tuner-analyser.js")
@@ -20,7 +26,8 @@ const tunerAnalyser = async (context) => {
 
     // Post Data to HTML
     tunerNode.port.onmessage = ({data}) => {
-        
+        ctx.fillStyle = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
     }
 }
 
@@ -34,6 +41,12 @@ window.addEventListener("load", async () => {
 
     buttonStart.disabled = false
     buttonStop.disabled = true
+
+
+    // Get our canvas
+    canvas = document.getElementById('freqScreen')
+    ctx = canvas.getContext('2d')
+
 
     // Resume the AudioContext and start recording 
     buttonStart.addEventListener("click", async () => {

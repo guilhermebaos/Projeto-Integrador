@@ -68,7 +68,7 @@ class TunerKnownString extends AudioWorkletProcessor {
 
       // Search for peak frequncy in range
       for(let i = 0; i < MAXFREQ; i++) {
-        absolutes.push( (this.soundDataFFT.real[i]**2 + this.soundDataFFT.imag[i]**2 )**.5 )
+        absolutes.push(this.soundDataFFT.real[i]**2 + this.soundDataFFT.imag[i]**2)
       }
 
       let maxValue = Math.max(...absolutes)
@@ -117,7 +117,7 @@ class TunerKnownString extends AudioWorkletProcessor {
 
       // Search for peak frequncy in range
       for(let i = 0; i < N; i++) {
-        absolutes.push( (real_and_imag.real[i]**2 + real_and_imag.imag[i]**2 )**.5 )
+        absolutes.push(real_and_imag.real[i]**2 + real_and_imag.imag[i]**2)
       }
 
       let maxValue = Math.max(...absolutes)

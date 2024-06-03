@@ -25,7 +25,7 @@ const tunerAnalyser = async (context) => {
 
     // Post Data to HTML
     tunerNode.port.onmessage = ({data}) => {
-        updateCanvas(data)
+        updateCanvas(data[0], data[1])
     }
 }
 
@@ -51,11 +51,18 @@ function fixCanvas() {
 }
 
 
+// Height needed for 
+const axisHeight = 25
+const axisPositions = [0, 0.25, 0.5, 0.75, 1]
+
 // Frequency mapping to logarithmic domain
-function updateCanvas(soundData) {
+function updateCanvas(soundData, MINFREQ) {
+    // Space available for spectrum
+    let YMAX = canvas.height - axisHeight
+
     // Update frequency 
     canvasPoints.push(soundData.splice(0, canvas.width))
-    if (canvasPoints.length > canvas.height) {
+    if (canvasPoints.length > YMAX) {
         canvasPoints.splice(0, 1)
     }
 
@@ -64,9 +71,9 @@ function updateCanvas(soundData) {
 
     let imageData = ctx.createImageData(canvas.width, canvas.height)
     let data = imageData.data
-    for (let line = 0; line < canvasPoints.length; line += 1) {
+    for (let line = axisHeight; line < canvasPoints.length + axisHeight; line += 1) {
         // Get the coefficients of the FFT for this line
-        let coefs = canvasPoints[line]
+        let coefs = canvasPoints[line - axisHeight]
 
         for (let i = 0; i < 4 * canvas.width; i += 4) {
             // Get color for next coefficient
@@ -81,6 +88,12 @@ function updateCanvas(soundData) {
     }
 
     ctx.putImageData(imageData, 0, 0)
+
+    // Axis
+    for (let j = 0; j < axisPositions.length; j += 1) {
+        let str = `${(MINFREQ + canvas.width * axisPositions[j]).toFixed(1)}Hz`
+        ctx.fillText(str, (canvas.width - 12 * str.length) * axisPositions[j], axisHeight - 5)
+    }
 }
 
 
@@ -101,6 +114,10 @@ window.addEventListener("load", async () => {
     
     // Fix canvas size
     fixCanvas()
+
+    // Select font for canvas
+    ctx.font = "20px Arial"
+    ctx.fillStyle = "rgba(255, 255, 255, 1)"
     
 
 
@@ -132,20 +149,23 @@ window.addEventListener("load", async () => {
 
 
 // Given a number, return an element of the ColorMap
-const mindB = -80
-const maxdB = 20
-const maxIndex = 255
+let mindB = -80
+let maxdB = 10
+let maxIndex = 255
 
-const A = maxIndex / (maxdB - mindB)
-const B = maxIndex / (1 - maxdB / mindB)
+let A = maxIndex / (maxdB - mindB)
+let B = maxIndex / (1 - maxdB / mindB)
 
 function getColor(num) {
     let dB = 10 * Math.log10(num)
     if (dB <= mindB) {
         return colorMap[0]
-    } else {
-        return colorMap[Math.floor(A * dB + B)]
+    } else if (dB >= maxdB) {
+        maxdB = dB * 1.001
+        A = maxIndex / (maxdB - mindB)
+        B = maxIndex / (1 - maxdB / mindB)
     }
+    return colorMap[Math.floor(A * dB + B)]
 }
 
 

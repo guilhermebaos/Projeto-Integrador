@@ -21,7 +21,7 @@ const SAMPLE_TIME = SAMPLE_LEN / SAMPLE_FREQ
 
 // Frequency range
 const MINFREQ = 20
-const MAXFREQ = 1000 // Should be equal to max-width of the canva we define in CSS
+const MAXFREQ = 2000 // Should be more then enough to cope in the case of a max-width canvas
 
 
 
@@ -99,7 +99,7 @@ class TunerAnalyser extends AudioWorkletProcessor {
 
         this.mag()
     
-        this.port.postMessage(this.soundDataAbs)
+        this.port.postMessage([this.soundDataAbs, MINFREQ])
         this.lastUpdate = currentTime
       }
     }

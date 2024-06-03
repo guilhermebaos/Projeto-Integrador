@@ -15,6 +15,7 @@ const audioContext = new AudioContext()
 let canvas
 let ctx
 let canvasPoints = new Array()
+let canvasColors = new Array()
 
 // Start Processing the Audio
 const tunerAnalyser = async (context) => {
@@ -66,10 +67,22 @@ function updateCanvas(soundData, MINFREQ) {
     // Space available for spectrum
     let YMAX = canvas.height - 2 * axisHeight
 
-    // Update frequency 
-    canvasPoints.push(soundData.splice(0, canvas.width))
+    // New data 
+    let newPoints = soundData.splice(0, canvas.width)
+
+    // Save it
+    canvasPoints.push(newPoints)
+
+    // Get corresponding colors
+    canvasColors.push([])
+    for (let c = 0; c < canvas.width; c += 1) {
+        canvasColors[canvasColors.length - 1].push(getColor(newPoints[c]))
+    }
+
+    // Cut old data
     if (canvasPoints.length > YMAX) {
         canvasPoints.splice(0, 1)
+        canvasColors.splice(0, 1)
     }
 
     // Data points per line (pixels * 4 because color is RGBA)
@@ -79,11 +92,11 @@ function updateCanvas(soundData, MINFREQ) {
     let data = imageData.data
     for (let line = axisHeight; line < canvasPoints.length + axisHeight; line += 1) {
         // Get the coefficients of the FFT for this line
-        let coefs = canvasPoints[line - axisHeight]
+        let coefs = canvasColors[line - axisHeight]
 
         for (let i = 0; i < 4 * canvas.width; i += 4) {
             // Get color for next coefficient
-            let color = getColor(coefs[Math.floor(i / 4)])
+            let color = coefs[Math.floor(i / 4)]
 
             // Set the color in RGBA
             data[line * DPL + i] = color[0]

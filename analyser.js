@@ -5,6 +5,12 @@ import {ComplexArray} from './fft.js'
 const audioContext = new AudioContext()
 
 
+// Ideias
+// Permitir ao utilizador variar a gama de frquências (deve ser fácil, só colocar uma barra e depois cortar a parte certa do soundData)
+// Permitir ao utilizador mudar a gama de dB
+// Criar opção de escala logaritmica (difícil)
+
+
 // Global variables
 let canvas
 let ctx
@@ -58,7 +64,7 @@ const axisPositions = [0, 0.25, 0.5, 0.75, 1]
 // Frequency mapping to logarithmic domain
 function updateCanvas(soundData, MINFREQ) {
     // Space available for spectrum
-    let YMAX = canvas.height - axisHeight
+    let YMAX = canvas.height - 2 * axisHeight
 
     // Update frequency 
     canvasPoints.push(soundData.splice(0, canvas.width))
@@ -89,10 +95,15 @@ function updateCanvas(soundData, MINFREQ) {
 
     ctx.putImageData(imageData, 0, 0)
 
-    // Axis
+    // Draw Axis
     for (let j = 0; j < axisPositions.length; j += 1) {
         let str = `${(MINFREQ + canvas.width * axisPositions[j]).toFixed(0)}Hz`
+
+        // Top Axis
         ctx.fillText(str, (canvas.width - 12 * str.length) * axisPositions[j], axisHeight - 5)
+        
+        // Top Axis
+        ctx.fillText(str, (canvas.width - 12 * str.length) * axisPositions[j], canvas.height - axisHeight + 20)
     }
 }
 

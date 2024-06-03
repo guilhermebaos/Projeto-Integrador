@@ -66,11 +66,11 @@ function updateCanvas(data) {
 
     let imageData = ctx.createImageData(canvas.width, canvas.height)
     data = imageData.data
-    for (let i = 0; i < testing * 1000; i += 4) {
+    for (let i = 0; i < testing * 4 * canvas.width; i += 4) {
         // Set the color in RGBA
-        data[i] = 255
-        data[i + 1] = 255
-        data[i + 2] = 255
+        data[i] = Math.floor(i / (4 * canvas.width)) % 255
+        data[i + 1] = Math.floor(i / (4 * canvas.width)) % 255
+        data[i + 2] = Math.floor(i / (4 * canvas.width)) % 255
         data[i + 3] = 255
     }
 

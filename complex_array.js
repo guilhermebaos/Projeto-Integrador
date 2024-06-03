@@ -67,4 +67,14 @@ export default class ComplexArray {
 
     return mags;
   }
+
+  magnitude2() {
+    const mags = new this.ArrayType(this.length);
+
+    this.forEach((value, i) => {
+      mags[i] = value.real*value.real + value.imag*value.imag;
+    })
+
+    return mags;
+  }
 }

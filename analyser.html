@@ -34,7 +34,7 @@
         <div class="collapse navbar-collapse" id="nav">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link" href="analisador.html">ANALISADOR DE<br>FREQUÊNCIAS</a>
+              <a class="nav-link" href="analyser.html">ANALISADOR DE<br>FREQUÊNCIAS</a>
             </li>
           </ul>
         </div>
@@ -52,6 +52,9 @@
           <button id="button-stop" type="button" class="btn btn-light" data-mdb-ripple-init data-mdb-ripple-color="dark">STOP</button>
         </div>
         
+        <div class="container">
+            <canvas id="freqScreen" width="800" height="600"></canvas>
+        </div>
     </main>
 
     <footer class="container-fluid fs-5 text-light px-3 mt-5">
@@ -69,6 +72,6 @@
     </footer>
 
     <!-- Our JS -->
-    <script src="index.js" type="module"></script>
+    <script src="analyser.js" type="module"></script>
 </body>
 </html>

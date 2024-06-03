@@ -96,4 +96,11 @@ nav, footer {
     width: 100%;
     transform: translateX(-100%);
 }
+
+
+
+canvas {
+    border: 1px solid black;
+    border-radius: 1px;
+}
   

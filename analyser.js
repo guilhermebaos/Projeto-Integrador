@@ -10,10 +10,6 @@ let canvas
 let ctx
 let canvasPoints = new Array()
 
-let XMAX
-let YMAX
-
-
 // Start Processing the Audio
 const tunerAnalyser = async (context) => {
     await context.audioWorklet.addModule("tuner-analyser.js")
@@ -57,19 +53,28 @@ function fixCanvas() {
 
 // Frequency mapping to logarithmic domain
 let freqPixels
+let testing = 0
 function updateCanvas(data) {
     // Update frequency 
     canvasPoints.push(data)
-    if (canvasPoints.length > YMAX) {
+    if (canvasPoints.length > canvas.height) {
         canvasPoints.splice(0, 1)
     }
 
-    // Clear the canvas
-    ctx.clearRect(0, 0, XMAX, YMAX)
-    
-    // Draw on the canvas
-    ctx.fillStyle = "rgb(255, 0, 0)"
-    ctx.fillRect(0, 0, XMAX, canvasPoints.length)
+
+    testing += 1
+
+    let imageData = ctx.createImageData(canvas.width, canvas.height)
+    data = imageData.data
+    for (let i = 0; i < testing * 1000; i += 4) {
+        // Set the color in RGBA
+        data[i] = 255
+        data[i + 1] = 255
+        data[i + 2] = 255
+        data[i + 3] = 255
+    }
+
+    ctx.putImageData(imageData, 0, 0)
 
 }
 
@@ -91,9 +96,6 @@ window.addEventListener("load", async () => {
     
     // Fix canvas size
     fixCanvas()
-
-    XMAX = canvas.width
-    YMAX = canvas.height
     
 
 

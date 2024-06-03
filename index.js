@@ -76,9 +76,9 @@ function updateBar(progressBar, current, freqTarget, tol) {
 
     // Ver se a mão está
     if (Math.abs(pos - 0.5) < 0.03) {
-        perfect.style.display = "block"
+        perfect.style.opacity = "1"
     } else {
-        perfect.style.display = "none"
+        perfect.style.opacity = "0"
     }
 }
 

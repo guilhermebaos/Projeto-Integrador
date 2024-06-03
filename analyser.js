@@ -54,7 +54,7 @@ function fixCanvas() {
 // Frequency mapping to logarithmic domain
 function updateCanvas(soundData) {
     // Update frequency 
-    canvasPoints.push(soundData)
+    canvasPoints.push(soundData.splice(0, canvas.width))
     if (canvasPoints.length > canvas.height) {
         canvasPoints.splice(0, 1)
     }
@@ -65,11 +65,17 @@ function updateCanvas(soundData) {
     let imageData = ctx.createImageData(canvas.width, canvas.height)
     let data = imageData.data
     for (let line = 0; line < canvasPoints.length; line += 1) {
+        // Get the coefficients of the FFT for this line
+        let coefs = canvasPoints[line]
+
         for (let i = 0; i < 4 * canvas.width; i += 4) {
+            // Get color for next coefficient
+            let color = getColor(coefs[Math.floor(i / 4)])
+
             // Set the color in RGBA
-            data[line * DPL + i] = line % 255
-            data[line * DPL + i + 1] = line % 255
-            data[line * DPL + i + 2] = line % 255
+            data[line * DPL + i] = color[0]
+            data[line * DPL + i + 1] = color[1]
+            data[line * DPL + i + 2] = color[2]
             data[line * DPL + i + 3] = 255
         }
     }
@@ -123,6 +129,24 @@ window.addEventListener("load", async () => {
 
     }, false)
 })
+
+
+// Given a number, return an element of the ColorMap
+const mindB = -80
+const maxdB = 20
+const maxIndex = 255
+
+const A = maxIndex / (maxdB - mindB)
+const B = maxIndex / (1 - maxdB / mindB)
+
+function getColor(num) {
+    let dB = 10 * Math.log10(num)
+    if (dB <= mindB) {
+        return colorMap[0]
+    } else {
+        return colorMap[Math.floor(A * dB + B)]
+    }
+}
 
 
 // ColorMap!

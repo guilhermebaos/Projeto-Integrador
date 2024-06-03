@@ -35,19 +35,19 @@ const DPR = window.devicePixelRatio
 
 
 // Fix the canvas size, account for DPR
-function fixCanvas() {
+function fixCanvas(canvasElement) {
 
     // Canvas size
-    let larguraCss = +getComputedStyle(canvas).getPropertyValue('width').slice(0, -2)
-    let alturaCss = +getComputedStyle(canvas).getPropertyValue('height').slice(0, -2)
+    let larguraCss = +getComputedStyle(canvasElement.parentElement).getPropertyValue('width').slice(0, -2)
+    let alturaCss = +getComputedStyle(canvasElement.parentElement).getPropertyValue('height').slice(0, -2)
 
     // Change canvas properties
-    canvas.width = larguraCss * DPR
-    canvas.height = alturaCss * DPR
+    canvasElement.width = larguraCss * DPR
+    canvasElement.height = alturaCss * DPR
 
     // Fix size of HTML element
-    canvas.style.width = `${larguraCss}px`
-    canvas.style.height = `${alturaCss}px`
+    canvasElement.style.width = `${larguraCss}px`
+    canvasElement.style.height = `${alturaCss}px`
 }
 
 
@@ -91,8 +91,37 @@ function updateCanvas(soundData, MINFREQ) {
 
     // Axis
     for (let j = 0; j < axisPositions.length; j += 1) {
-        let str = `${(MINFREQ + canvas.width * axisPositions[j]).toFixed(1)}Hz`
+        let str = `${(MINFREQ + canvas.width * axisPositions[j]).toFixed(0)}Hz`
         ctx.fillText(str, (canvas.width - 12 * str.length) * axisPositions[j], axisHeight - 5)
+    }
+}
+
+
+function drawColorbar(colorbar, colorbarCtx) {
+    // Data points per line (pixels * 4 because color is RGBA)
+    let DPL = 4 * colorbar.width
+
+    let imageData = colorbarCtx.createImageData(colorbar.width,colorbar.height)
+    let data = imageData.data
+    for (let line = axisHeight; line < colorbar.height; line += 1) {
+        for (let i = 0; i < 4 * colorbar.width; i += 4) {
+            // Get color for next coefficient
+            let color = colorMap[Math.floor(i / DPL * (colorMap.length - 1))]
+
+            // Set the color in RGBA
+            data[line * DPL + i] = color[0]
+            data[line * DPL + i + 1] = color[1]
+            data[line * DPL + i + 2] = color[2]
+            data[line * DPL + i + 3] = 255
+        }
+    }
+
+    colorbarCtx.putImageData(imageData, 0, 0)
+
+    // Axis
+    for (let j = 0; j < axisPositions.length; j += 1) {
+        let str = `${(mindB + (maxdB - mindB) * axisPositions[j]).toFixed(0)}dB`
+        colorbarCtx.fillText(str, (colorbar.width - 12 * str.length) * axisPositions[j], axisHeight - 5)
     }
 }
 
@@ -111,13 +140,24 @@ window.addEventListener("load", async () => {
     // Get our canvas
     canvas = document.getElementById("freqScreen")
     ctx = canvas.getContext("2d")
-    
-    // Fix canvas size
-    fixCanvas()
+    fixCanvas(canvas)
 
     // Select font for canvas
     ctx.font = "20px Arial"
     ctx.fillStyle = "rgba(255, 255, 255, 1)"
+
+
+
+    // Get colorbar canvas
+    let colorbar = document.getElementById("scaleScreen")
+    let colorbarCtx = colorbar.getContext("2d")
+    fixCanvas(colorbar)
+
+    // Draw the colorbar
+    colorbarCtx.font = "20px Arial"
+    colorbarCtx.fillStyle = "rgba(255, 255, 255, 1)"
+    drawColorbar(colorbar, colorbarCtx)
+
     
 
 
@@ -130,7 +170,7 @@ window.addEventListener("load", async () => {
         
         audioContext.resume()
         buttonStart.disabled = true
-        buttonStart.textContent = "Playing..."
+        buttonStart.textContent = "A Gravar..."
 
         buttonStop.disabled = false
 

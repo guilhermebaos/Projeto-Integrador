@@ -100,8 +100,6 @@ nav, footer {
 
 
 canvas {
-    border: 1px solid black;
-    border-radius: 1px;
     width: 100%;
 }
 
@@ -115,6 +113,16 @@ canvas {
 .canvas-container {
     margin: auto;
     padding: 0;
+}
+
+#scaleScreenContainer {
+    min-width: 300px;
+    min-height: 60px;
+    max-width: 1000px;
+    max-height: 60px;
+}
+
+#freqScreenContainer {
     min-width: 300px;
     min-height: 225px;
     max-width: 1000px;

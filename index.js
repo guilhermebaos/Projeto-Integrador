@@ -107,7 +107,7 @@ window.addEventListener("load", async () => {
         
         audioContext.resume()
         buttonStart.disabled = true
-        buttonStart.textContent = "Playing..."
+        buttonStart.textContent = "A Gravar..."
 
         buttonStop.disabled = false
 

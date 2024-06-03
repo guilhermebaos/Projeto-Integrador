@@ -55,12 +55,21 @@ function fixCanvas() {
 }
 
 
+// Frequency mapping to logarithmic domain
+let freqPixels
 function updateCanvas(data) {
-    // Clear the canvas
-
     // Update frequency 
     canvasPoints.push(data)
-    console.log(data)
+    if (canvasPoints.length > YMAX) {
+        canvasPoints.splice(0, 1)
+    }
+
+    // Clear the canvas
+    ctx.clearRect(0, 0, XMAX, YMAX)
+    
+    // Draw on the canvas
+    ctx.fillStyle = "rgb(255, 0, 0)"
+    ctx.fillRect(0, 0, XMAX, canvasPoints.length)
 
 }
 

@@ -21,7 +21,7 @@ const SAMPLE_TIME = SAMPLE_LEN / SAMPLE_FREQ
 
 // Frequency range
 const MINFREQ = 20
-const MAXFREQ = 2000 // Should be more then enough to cope in the case of a max-width canvas
+const MAXFREQ = 20000 // Should be more then enough to cope in the case of a max-width canvas
 
 
 

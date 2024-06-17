@@ -47,17 +47,27 @@
           </div>
         </div>
         <p>
-          Nesta página podes ver o espetro de frequências do som captado pelo teu microfone, de acordo com a escala abaixo:
+          Nesta página podes ver o a potência espetral do som captado pelo teu microfone, de acordo com a escala abaixo:
         </p>
         <div class="container canvas-overflow">
           <div id="scaleScreenContainer" class="canvas-container">
               <canvas id="scaleScreen"></canvas>
           </div>
         </div>
+        
 
-        <div class="container my-5">
+        <div class="container mt-5 mb-2">
           <button id="button-start" type="button" class="btn btn-light" data-mdb-ripple-init data-mdb-ripple-color="dark">START</button>
           <button id="button-stop" type="button" class="btn btn-light" data-mdb-ripple-init data-mdb-ripple-color="dark">STOP</button>
+        </div>
+
+        <div class="container my-3">
+          <div class="form-check">
+              <input type="checkbox" id="logScale" name="logScale" checked>
+              <label class="form-check-label" for="logScale">
+                  Escala logaritmica
+              </label>
+          </div>
         </div>
         
         <div class="container canvas-overflow">
@@ -65,6 +75,20 @@
               <canvas id="freqScreen"></canvas>
           </div>
         </div>
+
+        <div class="container mt-5">
+          <h2>Definições Adicionais</h2>
+          <p>Podes também alterar os seguintes parâmetros.</p>
+          <h3 class="mt-5">Alcance da Escala</h3>
+          <div class="range-input-container">
+              <label for="miniLinear" class="form-label">Mínimo da Escala</label>
+              <input type="range" class="form-range" id="miniLinear" name="miniLinear" min="20" max="20000" value="20">
+          </div>
+          <div class="range-input-container">
+              <label for="maxiLinear" class="form-label">Máximo da Escala</label>
+              <input type="range" class="form-range" id="maxiLinear" name="maxiLinear" min="20" max="20000" value="20000">
+          </div>
+      </div>
     </main>
 
     <footer class="container-fluid fs-5 text-light px-3 mt-5">

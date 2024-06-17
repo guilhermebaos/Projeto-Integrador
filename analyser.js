@@ -14,7 +14,6 @@ const audioContext = new AudioContext()
 // Global variables
 let canvas
 let ctx
-let canvasPoints = new Array()
 let canvasColors = new Array()
 
 // Start Processing the Audio
@@ -37,7 +36,7 @@ const tunerAnalyser = async (context) => {
 }
 
 
-// Obter o DPR do ecrã
+// Get screen DPR
 const DPR = window.devicePixelRatio
 
 
@@ -58,7 +57,10 @@ function fixCanvas(canvasElement) {
 }
 
 
-// Height needed for 
+// Human range of audible frequencies
+let MINSCALE, MAXSCALE, logScale
+
+// Height needed for frequency axis
 const axisHeight = 25
 const axisPositions = [0, 0.25, 0.5, 0.75, 1]
 
@@ -68,20 +70,78 @@ function updateCanvas(soundData, MINFREQ) {
     let YMAX = canvas.height - 2 * axisHeight
 
     // New data 
-    let newPoints = soundData.splice(0, canvas.width)
+    let newPoints
 
-    // Save it
-    canvasPoints.push(newPoints)
+    // Read scale interval
+    MINSCALE = Number(document.getElementById("miniLinear").value)
+    MAXSCALE = Number(document.getElementById("maxiLinear").value)
 
-    // Get corresponding colors
-    canvasColors.push([])
-    for (let c = 0; c < canvas.width; c += 1) {
-        canvasColors[canvasColors.length - 1].push(getColor(newPoints[c]))
+    // Read scale type
+    logScale = document.getElementById("logScale").checked
+
+    // Ratio between consecutive points (logScale)
+    let step = (MAXSCALE / MINSCALE) ** (1 / canvas.width)
+
+    // Logarithmic scale
+    if (logScale) {
+        newPoints = soundData
+        
+        
+        // Breakpoints between pixels
+        let breakpoints = [MINSCALE]
+        let breakpointsInt = [MINSCALE]
+        let breakpointsDec = [0]
+        for (let i = 0; i < canvas.width; i++) {
+            let temp = breakpoints[breakpoints.length - 1] * step
+
+            breakpoints.push(temp)
+            breakpointsInt.push(Math.floor(temp))
+            breakpointsDec.push(temp % 1)
+        }
+        
+        // Get corresponding colors
+        canvasColors.push([])
+        for (let c = 0; c < canvas.width; c += 1) {
+            let temp
+
+            // Calculate absolute value equivalent for this pixel
+            let left = breakpoints[c]
+            let right = breakpoints[c+1]
+
+            let leftInt = breakpointsInt[c]
+            let rightInt = breakpointsInt[c+1]
+
+            if (leftInt == rightInt) {
+                temp = newPoints[leftInt - MINFREQ] * (right - left)
+            } else {
+                let leftDec = breakpointsDec[c]
+                let rightDec = breakpointsDec[c+1]
+
+                temp = (1-leftDec) * newPoints[leftInt - MINFREQ] + rightDec * newPoints[rightInt - MINFREQ]
+
+                for (let j = leftInt + 1; j < rightInt; j++) {
+                    temp += newPoints[j - MINFREQ]
+                }
+            }
+
+            canvasColors[canvasColors.length - 1].push(getColor(temp))
+        }
+
+
+    // Linear scale
+    } else {
+        newPoints = soundData.splice(0, canvas.width)
+    
+        // Get corresponding colors
+        canvasColors.push([])
+        for (let c = 0; c < canvas.width; c += 1) {
+            canvasColors[canvasColors.length - 1].push(getColor(newPoints[c]))
+        }
     }
+    
 
     // Cut old data
-    if (canvasPoints.length > YMAX) {
-        canvasPoints.splice(0, 1)
+    if (canvasColors.length > YMAX) {
         canvasColors.splice(0, 1)
     }
 
@@ -90,7 +150,7 @@ function updateCanvas(soundData, MINFREQ) {
 
     let imageData = ctx.createImageData(canvas.width, canvas.height)
     let data = imageData.data
-    for (let line = axisHeight; line < canvasPoints.length + axisHeight; line += 1) {
+    for (let line = axisHeight; line < canvasColors.length + axisHeight; line += 1) {
         // Get the coefficients of the FFT for this line
         let coefs = canvasColors[line - axisHeight]
 
@@ -109,13 +169,21 @@ function updateCanvas(soundData, MINFREQ) {
     ctx.putImageData(imageData, 0, 0)
 
     // Draw Axis
+
     for (let j = 0; j < axisPositions.length; j += 1) {
-        let str = `${(MINFREQ + canvas.width * axisPositions[j]).toFixed(0)}Hz`
+        let str, freq
+        if (logScale) {
+            freq = MINFREQ * step ** (canvas.width * axisPositions[j])
+            str = `${freq.toFixed(0)}Hz`
+        } else {
+            freq = MINFREQ + canvas.width * axisPositions[j]
+            str = `${freq.toFixed(0)}Hz`
+        }
 
         // Top Axis
         ctx.fillText(str, (canvas.width - 12 * str.length) * axisPositions[j], axisHeight - 5)
         
-        // Top Axis
+        // Bottom Axis
         ctx.fillText(str, (canvas.width - 12 * str.length) * axisPositions[j], canvas.height - axisHeight + 20)
     }
 }
@@ -225,9 +293,7 @@ function getColor(num) {
     if (dB <= mindB) {
         return colorMap[0]
     } else if (dB >= maxdB) {
-        maxdB = dB * 1.001
-        A = maxIndex / (maxdB - mindB)
-        B = maxIndex / (1 - maxdB / mindB)
+        return colorMap[colorMap.length - 1]
     }
     return colorMap[Math.floor(A * dB + B)]
 }

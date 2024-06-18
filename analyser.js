@@ -59,10 +59,14 @@ function fixCanvas(canvasElement) {
 }
 
 
-// Human range of audible frequencies
-let MINSCALE = 20
-let MAXSCALE = 2000
+// Choosing scale
+let MINSCALE
+let MAXSCALE
 let logScale
+
+// Enabling HPS
+let HPSEnable = true
+let HPSk = 4
 
 // Height needed for frequency axis
 const axisHeight = 25
@@ -73,8 +77,30 @@ function updateCanvas(soundData, MINFREQ) {
     // Space available for spectrum
     let YMAX = canvas.height - 2 * axisHeight
 
+    // Read scale (later on we can add sliders for the user to input this range)
+    MINSCALE = 20
+    MAXSCALE = 2000
+
     // New data 
     let newPoints = soundData.splice(0, MAXSCALE - MINSCALE + 1)
+
+    // Enable HPS
+    if (HPSEnable) {
+        let newPointsTemp = []
+
+        MAXSCALE = Math.floor(MAXSCALE / HPSk)
+
+        for (let f = MINSCALE; f <= MAXSCALE; f++) {
+            let result = 1
+            for (let j = 1; j <= HPSk; j++) {
+                result *= newPoints[f * j - MINFREQ]
+            }
+
+            newPointsTemp.push(result)
+        }
+
+        newPoints = newPointsTemp
+    }
 
     // Read scale type
     logScale = document.getElementById("logScale").checked
@@ -139,7 +165,6 @@ function updateCanvas(soundData, MINFREQ) {
 
         canvasColors[canvasColors.length - 1].push(getColor(temp))
     }
-    
 
     // Cut old data
     if (canvasColors.length > YMAX) {

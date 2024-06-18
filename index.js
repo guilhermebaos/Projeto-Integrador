@@ -1,5 +1,5 @@
 // Import FFT
-import {ComplexArray} from '/fft.js'
+import {ComplexArray} from './fft.js'
 
 // Global variables
 let progressBar

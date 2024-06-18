@@ -1,4 +1,4 @@
-import baseComplexArray from '/complex_array.js'
+import baseComplexArray from './complex_array.js'
 
 
 // Math constants and functions we need.

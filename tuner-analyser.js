@@ -1,5 +1,5 @@
 // Import FFT
-import {ComplexArray} from './fft.js'
+import {ComplexArray} from '/fft.js'
 
 
 // Set the framerate
@@ -20,10 +20,8 @@ const SAMPLE_FREQ = 48000
 const SAMPLE_TIME = SAMPLE_LEN / SAMPLE_FREQ
 
 // Frequency range
-const MINFREQ = 20
-const MAXFREQ = 20000 // Should be more then enough to cope in the case of a max-width canvas
-
-
+let MINFREQ = 20
+let MAXFREQ = 2000
 
 
 class TunerAnalyser extends AudioWorkletProcessor {

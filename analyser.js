@@ -1,5 +1,5 @@
 // Import FFT
-import {ComplexArray} from './fft.js'
+import {ComplexArray} from '/fft.js'
 
 // Create AudioContext
 const audioContext = new AudioContext()
@@ -17,6 +17,7 @@ let ctx
 let canvasColors = new Array()
 
 // Start Processing the Audio
+let tunerNodeGlobal
 const tunerAnalyser = async (context) => {
     await context.audioWorklet.addModule("tuner-analyser.js")
 
@@ -24,6 +25,7 @@ const tunerAnalyser = async (context) => {
     const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true})
     const micNode = context.createMediaStreamSource(mediaStream)
     const tunerNode = new AudioWorkletNode(context, "tuner-analyser")
+    tunerNodeGlobal = tunerNode
 
 
     // Connect audio recorder to WorkletNode
@@ -58,7 +60,9 @@ function fixCanvas(canvasElement) {
 
 
 // Human range of audible frequencies
-let MINSCALE, MAXSCALE, logScale
+let MINSCALE = 20
+let MAXSCALE = 2000
+let logScale
 
 // Height needed for frequency axis
 const axisHeight = 25
@@ -70,27 +74,22 @@ function updateCanvas(soundData, MINFREQ) {
     let YMAX = canvas.height - 2 * axisHeight
 
     // New data 
-    let newPoints
-
-    // Read scale interval
-    MINSCALE = Number(document.getElementById("miniLinear").value)
-    MAXSCALE = Number(document.getElementById("maxiLinear").value)
+    let newPoints = soundData.splice(0, MAXSCALE - MINSCALE + 1)
 
     // Read scale type
     logScale = document.getElementById("logScale").checked
-
-    // Ratio between consecutive points (logScale)
-    let step = (MAXSCALE / MINSCALE) ** (1 / canvas.width)
+    
+    // Breakpoints between pixels
+    let breakpoints = [MINSCALE]
+    let breakpointsInt = [MINSCALE]
+    let breakpointsDec = [0]
 
     // Logarithmic scale
+    let step
     if (logScale) {
-        newPoints = soundData
-        
-        
-        // Breakpoints between pixels
-        let breakpoints = [MINSCALE]
-        let breakpointsInt = [MINSCALE]
-        let breakpointsDec = [0]
+        // Ratio between consecutive points (logScale)
+        step = (MAXSCALE / MINSCALE) ** (1 / canvas.width)
+
         for (let i = 0; i < canvas.width; i++) {
             let temp = breakpoints[breakpoints.length - 1] * step
 
@@ -98,45 +97,47 @@ function updateCanvas(soundData, MINFREQ) {
             breakpointsInt.push(Math.floor(temp))
             breakpointsDec.push(temp % 1)
         }
-        
-        // Get corresponding colors
-        canvasColors.push([])
-        for (let c = 0; c < canvas.width; c += 1) {
-            let temp
-
-            // Calculate absolute value equivalent for this pixel
-            let left = breakpoints[c]
-            let right = breakpoints[c+1]
-
-            let leftInt = breakpointsInt[c]
-            let rightInt = breakpointsInt[c+1]
-
-            if (leftInt == rightInt) {
-                temp = newPoints[leftInt - MINFREQ] * (right - left)
-            } else {
-                let leftDec = breakpointsDec[c]
-                let rightDec = breakpointsDec[c+1]
-
-                temp = (1-leftDec) * newPoints[leftInt - MINFREQ] + rightDec * newPoints[rightInt - MINFREQ]
-
-                for (let j = leftInt + 1; j < rightInt; j++) {
-                    temp += newPoints[j - MINFREQ]
-                }
-            }
-
-            canvasColors[canvasColors.length - 1].push(getColor(temp))
-        }
-
 
     // Linear scale
     } else {
-        newPoints = soundData.splice(0, canvas.width)
-    
-        // Get corresponding colors
-        canvasColors.push([])
-        for (let c = 0; c < canvas.width; c += 1) {
-            canvasColors[canvasColors.length - 1].push(getColor(newPoints[c]))
+        // Ratio between consecutive points (logScale)
+        step = (MAXSCALE - MINSCALE) / canvas.width
+
+        for (let i = 0; i < canvas.width; i++) {
+            let temp = breakpoints[breakpoints.length - 1] + step
+
+            breakpoints.push(temp)
+            breakpointsInt.push(Math.floor(temp))
+            breakpointsDec.push(temp % 1)
         }
+    }
+
+    // Get corresponding colors
+    canvasColors.push([])
+    for (let c = 0; c < canvas.width; c += 1) {
+        let temp
+
+        // Calculate absolute value equivalent for this pixel
+        let left = breakpoints[c]
+        let right = breakpoints[c+1]
+
+        let leftInt = breakpointsInt[c]
+        let rightInt = breakpointsInt[c+1]
+
+        if (leftInt == rightInt) {
+            temp = newPoints[leftInt - MINFREQ] * (right - left)
+        } else {
+            let leftDec = breakpointsDec[c]
+            let rightDec = breakpointsDec[c+1]
+
+            temp = (1-leftDec) * newPoints[leftInt - MINFREQ] + rightDec * newPoints[rightInt - MINFREQ]
+
+            for (let j = leftInt + 1; j < rightInt; j++) {
+                temp += newPoints[j - MINFREQ]
+            }
+        }
+
+        canvasColors[canvasColors.length - 1].push(getColor(temp))
     }
     
 
@@ -176,7 +177,7 @@ function updateCanvas(soundData, MINFREQ) {
             freq = MINFREQ * step ** (canvas.width * axisPositions[j])
             str = `${freq.toFixed(0)}Hz`
         } else {
-            freq = MINFREQ + canvas.width * axisPositions[j]
+            freq = MINFREQ + (MAXSCALE - MINFREQ) * axisPositions[j]
             str = `${freq.toFixed(0)}Hz`
         }
 

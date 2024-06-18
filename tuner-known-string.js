@@ -35,6 +35,9 @@ const AVE = 10
 // Maximum frequency to search for
 const MAXFREQ = 500
 
+// HPS k value
+let HPSk = 4
+
 
 class TunerKnownString extends AudioWorkletProcessor {
 
@@ -67,10 +70,25 @@ class TunerKnownString extends AudioWorkletProcessor {
       let absolutes = new Array()
 
       // Search for peak frequncy in range
-      for(let i = 0; i < MAXFREQ; i++) {
+      for(let i = 0; i < HPSk * MAXFREQ; i++) {
         absolutes.push(this.soundDataFFT.real[i]**2 + this.soundDataFFT.imag[i]**2)
       }
 
+      // Use HPS
+      let absolutesTemp = []
+      for (let f = 0; f < MAXFREQ; f++) {
+          let result = 1
+          for (let j = 1; j <= HPSk; j++) {
+              result *= absolutes[f * j]
+          }
+
+          absolutesTemp.push(result)
+      }
+
+      absolutes = absolutesTemp
+
+
+      // Find maximum
       let maxValue = Math.max(...absolutes)
       let maxIndex = absolutes.indexOf(maxValue)
 
@@ -93,10 +111,9 @@ class TunerKnownString extends AudioWorkletProcessor {
       this.refFreq = FREQS[freqIndex]
       this.refToler = TOLERS[freqIndex]
       this.refLetter = LETTERS[freqIndex]
-
   }
 
-
+  /*
   identifyKnownMax(freq, tol, percent=false) {
       // Calculate tolerance
       if (percent){
@@ -135,6 +152,7 @@ class TunerKnownString extends AudioWorkletProcessor {
       this.refToler = tol
       this.refLetter = ind
   }
+  */
 
   process(inputs, outputs) {
     // Get the sound data

@@ -3,6 +3,10 @@ import {ComplexArray} from './fft.js'
 
 // Global variables
 let progressBar
+let perfect
+
+const LETTERS = ["E2", "A2", "D3", "G3", "B3", "E4"]
+let guitar = []
 
 // Create AudioContext
 const audioContext = new AudioContext()
@@ -23,7 +27,7 @@ const tunerKnownString = async (context) => {
 
     // Post Data to HTML
     tunerNode.port.onmessage = ({data}) => {
-        letter.innerText = data[3]
+        escolherLetra(data[3])
         updateBar(progressBar, data[0], data[1], data[2])
     }
 }
@@ -83,6 +87,22 @@ function updateBar(progressBar, current, freqTarget, tol) {
 }
 
 
+function escolherLetra(str) {
+    let index = LETTERS.indexOf(str)
+
+    for (let i = 0; i < LETTERS.length; i++) {
+        if (i == index) {
+            console.log("Here!")
+            guitar[i].style.backgroundColor = "rgb(94, 252, 141)"
+            guitar[i].style.color = "black"
+        } else {
+            guitar[i].style.backgroundColor = "unset"
+            guitar[i].style.color = "white"
+        }
+    }
+}
+
+
 // Start Tuning
 let tunerActive = false
 window.addEventListener("load", async () => {
@@ -90,8 +110,12 @@ window.addEventListener("load", async () => {
     const buttonStart = document.getElementById("button-start")
     const buttonStop = document.getElementById("button-stop")
 
-    const perfect = document.getElementById("perfect")
-    const letter = document.getElementById("letter")
+    perfect = document.getElementById("perfect")
+
+    for (let i = 0; i < 6; i++) {
+        guitar.push(document.getElementById(LETTERS[i]))
+    }
+    console.log(guitar)
 
     progressBar = document.querySelector('.progress-bar')
 

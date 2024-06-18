@@ -65,7 +65,7 @@ let MAXSCALE
 let logScale
 
 // Enabling HPS
-let HPSEnable = true
+let HPSEnable
 let HPSk = 4
 
 // Height needed for frequency axis
@@ -76,6 +76,12 @@ const axisPositions = [0, 0.25, 0.5, 0.75, 1]
 function updateCanvas(soundData, MINFREQ) {
     // Space available for spectrum
     let YMAX = canvas.height - 2 * axisHeight
+    
+    // Read scale type
+    logScale = document.getElementById("logScale").checked
+
+    // Read HPSEnable
+    HPSEnable = document.getElementById("HPSEnable").checked
 
     // Read scale (later on we can add sliders for the user to input this range)
     MINSCALE = 20
@@ -101,9 +107,6 @@ function updateCanvas(soundData, MINFREQ) {
 
         newPoints = newPointsTemp
     }
-
-    // Read scale type
-    logScale = document.getElementById("logScale").checked
     
     // Breakpoints between pixels
     let breakpoints = [MINSCALE]

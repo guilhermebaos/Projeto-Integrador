@@ -19,6 +19,12 @@ nav, footer {
     color: #c1c1c1;
 }
 
+.myfont {
+    font-family: "Century Gothic";
+    font-style: italic;
+    font-weight: bolder;
+}
+
 .img-title {
     width: 75%;
     min-width: 200px;

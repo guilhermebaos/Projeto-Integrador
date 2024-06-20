@@ -62,7 +62,7 @@ class TunerKnownString extends AudioWorkletProcessor {
       let absolutes = new Array()
 
       // Search for peak frequncy in range
-      for(let i = 0; i < HPSk * MAXFREQ; i++) {
+      for(let i = 0; i < MAXFREQ; i++) {
         absolutes.push(this.soundDataFFT.real[i]**2 + this.soundDataFFT.imag[i]**2)
       }
 
@@ -71,7 +71,17 @@ class TunerKnownString extends AudioWorkletProcessor {
       let maxIndex = absolutes.indexOf(maxValue)
 
       // Correct the maximum
-      let delta = 0
+      let a = this.soundDataFFT.real[maxIndex + 1] - this.soundDataFFT.real[maxIndex - 1]
+      let b = this.soundDataFFT.imag[maxIndex + 1] - this.soundDataFFT.imag[maxIndex - 1]
+      let c = 2 * this.soundDataFFT.real[maxIndex] - this.soundDataFFT.real[maxIndex + 1] - this.soundDataFFT.real[maxIndex - 1]
+      let d = 2 * this.soundDataFFT.imag[maxIndex] - this.soundDataFFT.imag[maxIndex + 1] - this.soundDataFFT.imag[maxIndex - 1]
+      let delta = Number((a * c + b * d) / (c**2 + d**2)) + 0
+
+      if (delta !== delta) {
+          delta = 0
+      }
+
+      // Save peak frequency
       let fpeak = (maxIndex - delta) * SAMPLE_FREQ / N
       this.max = fpeak
   }

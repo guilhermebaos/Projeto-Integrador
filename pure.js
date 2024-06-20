@@ -19,6 +19,7 @@ const audioContext = new AudioContext()
 
 
 // Start Processing the Audio
+let freqTarget
 const tunerKnownString = async (context) => {
     await context.audioWorklet.addModule("tuner-known-string.js")
 

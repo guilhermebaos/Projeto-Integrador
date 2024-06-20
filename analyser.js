@@ -85,7 +85,7 @@ function updateCanvas(soundData, MINFREQ) {
 
     // Read scale (later on we can add sliders for the user to input this range)
     MINSCALE = 20
-    MAXSCALE = 2000
+    MAXSCALE = 20000
 
     // New data 
     let newPoints = soundData.splice(0, MAXSCALE - MINSCALE + 1)
@@ -202,11 +202,11 @@ function updateCanvas(soundData, MINFREQ) {
     for (let j = 0; j < axisPositions.length; j += 1) {
         let str, freq
         if (logScale) {
-            freq = MINFREQ * step ** (canvas.width * axisPositions[j])
+            freq = MINSCALE * step ** (canvas.width * axisPositions[j])
             str = `${freq.toFixed(0)}Hz`
         } else {
-            freq = MINFREQ + (MAXSCALE - MINFREQ) * axisPositions[j]
-            str = `${freq.toFixed(0)}Hz`
+            freq = MINSCALE + (MAXSCALE - MINSCALE) * axisPositions[j]
+            str = `${(freq * 0.01).toFixed(0) * 100}Hz`
         }
 
         // Top Axis

@@ -21,7 +21,7 @@ const SAMPLE_TIME = SAMPLE_LEN / SAMPLE_FREQ
 
 // Frequency range
 let MINFREQ = 20
-let MAXFREQ = 2000
+let MAXFREQ = 20000
 
 
 class TunerAnalyser extends AudioWorkletProcessor {

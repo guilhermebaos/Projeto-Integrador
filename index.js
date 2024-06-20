@@ -160,6 +160,9 @@ window.addEventListener("load", async () => {
         
         buttonStop.disabled = true
 
+        updateBar(progressBar, 0, 1e3, 1)
+        freqShow.innerText = `0.0`
+
     }, false)
 })
 

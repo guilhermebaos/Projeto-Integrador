@@ -20,7 +20,7 @@ const SAMPLE_FREQ = 48000
 const SAMPLE_TIME = SAMPLE_LEN / SAMPLE_FREQ
 
 // Guitar strings
-const FREQS = [82, 110, 147, 196, 247, 330]
+const FREQS = [82.4, 110, 146.8, 196, 246.9, 329.6]
 const TOLERS = [14, 19, 25, 26, 42, 42]
 const LETTERS = ["E2", "A2", "D3", "G3", "B3", "E4"]
 

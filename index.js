@@ -8,6 +8,11 @@ let perfect
 const LETTERS = ["E2", "A2", "D3", "G3", "B3", "E4"]
 let guitar = []
 
+
+// How long between each message to ESP32 (in miliseconds)
+const MQTTwait = 500
+let now = Date.now()
+
 // Create AudioContext
 const audioContext = new AudioContext()
 
@@ -29,6 +34,12 @@ const tunerKnownString = async (context) => {
     tunerNode.port.onmessage = ({data}) => {
         escolherLetra(data[3])
         updateBar(progressBar, data[0], data[1], data[2])
+
+        // Send to ESP32 via MQTT
+        if (Date.now() - now >= MQTTwait) {
+            client.publish(topico, String(data[0]))
+            now = Date.now()
+        }
     }
 }
 
@@ -92,7 +103,6 @@ function escolherLetra(str) {
 
     for (let i = 0; i < LETTERS.length; i++) {
         if (i == index) {
-            console.log("Here!")
             guitar[i].style.backgroundColor = "rgb(94, 252, 141)"
             guitar[i].style.color = "black"
         } else {
@@ -115,7 +125,6 @@ window.addEventListener("load", async () => {
     for (let i = 0; i < 6; i++) {
         guitar.push(document.getElementById(LETTERS[i]))
     }
-    console.log(guitar)
 
     progressBar = document.querySelector('.progress-bar')
 
@@ -146,4 +155,33 @@ window.addEventListener("load", async () => {
         buttonStop.disabled = true
 
     }, false)
+})
+
+
+
+// Connect to the MQTT broker using WebSockets
+const client = mqtt.connect('ws://broker.emqx.io:8083/mqtt')
+const topico = "afinador-site"
+
+client.on('connect', function () {
+    console.log('Connected')
+
+    // Subscribe to a topic
+    client.subscribe(topico, function (err) {
+        if (!err) {
+            console.log('Subscribed to topic')
+        } else {
+            console.log(err)
+        }
+    })
+
+    // Publish to a topic
+    client.publish(topico, 'Connection is OK!')
+})
+
+// Handle incoming messages
+client.on('message', function (topic, message) {
+
+    // Message is Buffer
+    console.log(`Received message: ${message.toString()} on topic: ${topic}`)
 })

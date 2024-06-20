@@ -15,11 +15,16 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
+
+    <!-- MQTT Library -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+
     <!-- Our CSS -->
     <link rel="stylesheet" href="style.css">
 
     <title>
-        Analisador de Frequências
+        Afinador Digital
     </title>
 </head>
 <body>
@@ -47,48 +52,48 @@
 
     <main class="container text-center mt-4 col-md-8 col-md-offset-2 col-xl-6 col-xl-offset-6">
         <div class="container w-100 my-5">
-          <h1 class="myfont">Analisador de Frequências</h1>
+            <h1 class="myfont">Detetor de Sons Puros</h1>
         </div>
-        <p>
-          Nesta página podes ver o a potência espetral do som captado pelo teu microfone, de acordo com a escala abaixo:
-        </p>
-        <div class="container canvas-overflow">
-          <div id="scaleScreenContainer" class="canvas-container">
-              <canvas id="scaleScreen"></canvas>
-          </div>
-        </div>
-        
 
-        <div class="container mt-5 mb-2">
+        <div class="container my-5">
           <button id="button-start" type="button" class="btn btn-light" data-mdb-ripple-init data-mdb-ripple-color="dark">START</button>
           <button id="button-stop" type="button" class="btn btn-light" data-mdb-ripple-init data-mdb-ripple-color="dark">STOP</button>
         </div>
-
-        <div class="container my-3 text-start">
-          <div class="row">
-            <div class="col-12">
-              <input type="checkbox" id="logScale" name="logScale">
-              <label class="form-check-label" for="logScale">
-                  Escala logarítmica
-              </label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-12">
-              <input type="checkbox" id="HPSEnable" name="HPSEnable">
-              <label class="form-check-label" for="HPSEnable">
-                  Detetar frequência fundamental
-              </label>
-            </div>
-          </div>
-        </div>
         
-        <div class="container canvas-overflow">
-          <div id="freqScreenContainer" class="canvas-container">
-              <canvas id="freqScreen"></canvas>
+        <div class="container px-1 px-md-5">
+          <div class="row">
+            <div class="col-4 col-md-2"></div>
+            <div class="col-4 col-md-8">
+              Frequência: <span id="freqShow">0.0</span>Hz
+            </div>
+            <div class="col-4 col-md-2"></div>
+          </div>
+          <div class="row my-3 progress-bar__container__container">          
+            <div class="progress-bar__container mx-auto">
+              <div class="progress-bar"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-4 col-md-2">
+              <img class="img-tuner img-low" src="img/low.png" alt="Too low!">
+            </div>
+            <div class="col-4 col-md-8">
+              <div id="perfect" style="opacity: 0;">
+                <img class="img-tuner img-mid" src="img/mid.png" alt="Perfect!">
+              </div>
+            </div>
+            <div class="col-4 col-md-2">
+              <img class="img-tuner img-high" src="img/high.png" alt="Too high!">
+            </div>
           </div>
         </div>
-      </div>
+
+        <div class="container w-75">
+            <div class="m-3 px-0 px-md-5">
+                <label for="testFreq" class="form-label">Frequência&nbsp;de Comparação&nbsp;(Hz):</label>
+                <input type="text" class="form-control" id="testFreq" name="testFreq" placeholder="Escreve aqui!">
+            </div>
+        </div>
     </main>
 
     <footer class="container-fluid fs-5 text-light px-3 mt-5">
@@ -106,6 +111,6 @@
     </footer>
 
     <!-- Our JS -->
-    <script src="analyser.js" type="module"></script>
+    <script src="pure.js" type="module"></script>
 </body>
 </html>

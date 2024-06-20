@@ -32,14 +32,23 @@ const tunerKnownString = async (context) => {
     micNode.connect(tunerNode).connect(context.destination)
 
     // Post Data to HTML
-    tunerNode.port.onmessage = ({data}) => {
-        updateBar(progressBar, data[0], data[1])
-
+    tunerNode.port.onmessage = ({data}) => {    
         freqShow.innerText = `${data[0].toFixed(1)}`
+
+        // Obter a frequência inserida pelo utilizador
+        try {
+            freqTarget = Number(testFreq.value)
+        } catch (e) {
+            console.log(e)
+            return
+        }
+
+        updateBar(progressBar, data[0], data[1], freqTarget)
+
 
         // Send to ESP32 via MQTT
         if (Date.now() - now >= MQTTwait) {
-            client.publish(topico, String(data[0]))
+            client.publish(topico, `${data[0]}|${freqTarget}`)
             now = Date.now()
         }
     }
@@ -69,16 +78,7 @@ function gradient(num) {
     return color
 }
 
-let freqTarget
-function updateBar(progressBar, current) {
-    // Obter a frequência inserida pelo utilizador
-    try {
-        freqTarget = Number(testFreq.value)
-    } catch (e) {
-        console.log(e)
-        return
-    }
-
+function updateBar(progressBar, current, freqTarget) {
     if (freqTarget == 0) return
 
     let tol = tolRel * freqTarget

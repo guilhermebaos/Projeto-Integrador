@@ -41,7 +41,7 @@ const tunerKnownString = async (context) => {
 
         // Send to ESP32 via MQTT
         if (Date.now() - now >= MQTTwait) {
-            client.publish(topico, String(data[0]))
+            client.publish(topico, `${data[0]}|${data[1]}`)
             now = Date.now()
         }
     }

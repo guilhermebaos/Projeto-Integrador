@@ -97,7 +97,7 @@ nav, footer {
 .progress-bar__container:after {
     content: '';
     position: absolute;
-    border-right: 4px rgb(94, 252, 141) solid;
+    border-right: 4px #F9E802 solid;
     height: 100%;
     width: 100%;
     transform: translateX(-100%);

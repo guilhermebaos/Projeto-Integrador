@@ -206,7 +206,11 @@ function updateCanvas(soundData, MINFREQ) {
             str = `${freq.toFixed(0)}Hz`
         } else {
             freq = MINSCALE + (MAXSCALE - MINSCALE) * axisPositions[j]
-            str = `${(freq * 0.01).toFixed(0) * 100}Hz`
+            
+            // Obrigar a que tenha dois significativos
+            let grandeza = `${freq.toFixed(0)}`.length
+            
+            str = `${(freq / 10**(grandeza-2)).toFixed(0) * 10**(grandeza-2)}Hz`
         }
 
         // Top Axis

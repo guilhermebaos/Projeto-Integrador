@@ -44,7 +44,7 @@ const tunerKnownString = async (context) => {
             return
         }
 
-        updateBar(progressBar, data[0], data[1], freqTarget)
+        updateBar(progressBar, data[0], freqTarget)
 
 
         // Send to ESP32 via MQTT

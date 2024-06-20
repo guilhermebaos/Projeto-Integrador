@@ -8,6 +8,8 @@ let perfect
 const LETTERS = ["E2", "A2", "D3", "G3", "B3", "E4"]
 let guitar = []
 
+let freqShow
+
 
 // How long between each message to ESP32 (in miliseconds)
 const MQTTwait = 500
@@ -34,6 +36,8 @@ const tunerKnownString = async (context) => {
     tunerNode.port.onmessage = ({data}) => {
         escolherLetra(data[3])
         updateBar(progressBar, data[0], data[1], data[2])
+
+        freqShow.innerText = `${data[0].toFixed(1)}`
 
         // Send to ESP32 via MQTT
         if (Date.now() - now >= MQTTwait) {
@@ -127,6 +131,8 @@ window.addEventListener("load", async () => {
     }
 
     progressBar = document.querySelector('.progress-bar')
+
+    freqShow = document.getElementById("freqShow")
 
     buttonStart.disabled = false
     buttonStop.disabled = true

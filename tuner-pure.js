@@ -28,10 +28,11 @@ const AVE = 10
 
 
 // Maximum frequency to search for
-const MAXFREQ = 2000
+const MINFREQ = 20
+const MAXFREQ = 20000
 
 
-class TunerKnownString extends AudioWorkletProcessor {
+class TunerPure extends AudioWorkletProcessor {
 
   constructor() {
       super()
@@ -62,7 +63,7 @@ class TunerKnownString extends AudioWorkletProcessor {
       let absolutes = new Array()
 
       // Search for peak frequncy in range
-      for(let i = 0; i < MAXFREQ; i++) {
+      for(let i = MINFREQ; i < MAXFREQ; i++) {
         absolutes.push(this.soundDataFFT.real[i]**2 + this.soundDataFFT.imag[i]**2)
       }
 
@@ -82,7 +83,7 @@ class TunerKnownString extends AudioWorkletProcessor {
       }
 
       // Save peak frequency
-      let fpeak = (maxIndex - delta) * SAMPLE_FREQ / N
+      let fpeak = (MINFREQ + maxIndex - delta) * SAMPLE_FREQ / N
       this.max = fpeak
   }
 
@@ -135,4 +136,4 @@ class TunerKnownString extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor("tuner-known-string", TunerKnownString)
+registerProcessor("tuner-pure", TunerPure)

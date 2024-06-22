@@ -21,12 +21,12 @@ const audioContext = new AudioContext()
 // Start Processing the Audio
 let freqTarget
 const tunerKnownString = async (context) => {
-    await context.audioWorklet.addModule("tuner-known-string.js")
+    await context.audioWorklet.addModule("tuner-pure.js")
 
     // Setup Audio Recording
     const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true})
     const micNode = context.createMediaStreamSource(mediaStream)
-    const tunerNode = new AudioWorkletNode(context, "tuner-known-string")
+    const tunerNode = new AudioWorkletNode(context, "tuner-pure")
 
 
     // Connect audio recorder to WorkletNode
